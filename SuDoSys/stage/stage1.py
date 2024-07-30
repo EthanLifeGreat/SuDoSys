@@ -1,16 +1,12 @@
-from openai import OpenAI
 import re
 import json
-openai_api_key = "EMPTY"
-openai_api_base = "http://10.10.1.211:8008/v1"
+from SuDoSys import chat
 
-client = OpenAI(
-    api_key=openai_api_key,
-    base_url=openai_api_base,
-)
 '''
 字符串正则查找位置并拼接
 '''
+
+
 def insert_after_match(text, pattern, to_insert):
     # 使用正则表达式查找模式
     match = re.search(pattern, text)
@@ -27,12 +23,13 @@ def insert_after_match(text, pattern, to_insert):
     else:
         # 如果没有找到匹配项，则返回原始文本或进行其他处理
         return text
-def handler(message,cache):
-    fName = 'stage4.txt'
-    ff = open('./prompt/' + fName, 'r', encoding='utf-8')
-    prompt = ff.read()
 
-    prompt = insert_after_match(prompt, ".*?第三步传递的数据如下：", "问题："+str(cache['problemSelected'])+"，影响因素："+str(cache['factors']))
+
+def handler(message, cache):
+    fName = 'stage1.txt'
+    ff = open('./SuDoSys/prompt/' + fName, 'r', encoding='utf-8')
+    prompt = ff.read()
+    prompt = f"{prompt}\n在前一阶段，你已经得到关于用户困扰的如下信息：{cache}"
     newInput = ""
     lastMessage = ""
     conversation = message.copy()
@@ -42,15 +39,17 @@ def handler(message,cache):
 
         if conversation and conversation[-1]['role'] == 'assistant':
             lastMessage = conversation.pop()['content']
-    from utils import chat
     responseJson = chat.chatReturnJson(prompt, lastMessage, newInput)
-    print(responseJson)
 
+    # print(responseJson)
 
-    # 文件路径
-
-    data1 = {"solutions":[]}
-    data1["solutions"] = responseJson['solutions']
-    cache.update(data1)
-
-    return responseJson,cache
+    # historyfile = "./history.txt"
+    # with open(historyfile, 'a', encoding='utf-8') as file:
+    #     file.write("\n咨询者：" + userInput.replace("\n", "") + "\n" + "咨询师：" + responseJson['response'])
+    data = {"stage": 1}
+    try:
+        data.update(cache)
+        data['problems'] = responseJson['problems']
+    except json.decoder.JSONDecodeError:
+        data = {'problems': responseJson['problems']}
+    return responseJson, data

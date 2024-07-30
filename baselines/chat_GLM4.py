@@ -1,5 +1,6 @@
 from openai import OpenAI
 import json
+
 openai_api_key = "EMPTY"
 openai_api_base = "http://10.10.1.213:8009/v1"
 
@@ -7,19 +8,21 @@ client = OpenAI(
     api_key=openai_api_key,
     base_url=openai_api_base,
 )
-def chatUserInput(prompt,lastOutput):
 
+
+def chatUserInput(prompt, lastOutput):
     chat_response = open_ai_chat(
-    model="GLM-4-9B-chat",
-    messages=[
+        model="GLM-4-9B-chat",
+        messages=[
             {"role": "system", "content": "你是一位沉默寡言的咨询者，你只会回答关键信息。"},
-            {"role": "user", "content": prompt+"\n咨询者："},
+            {"role": "user", "content": prompt + "\n咨询者："},
             # {"role": "user", "content": lastOutput},
-    ],
-    streaming=True
-)
-    print("prompt:"+prompt+"\n咨询者：")
+        ],
+        streaming=True
+    )
+    print("prompt:" + prompt + "\n咨询者：")
     return chat_response
+
 
 def open_ai_chat(model, messages, streaming=False):
     if not streaming:
@@ -34,7 +37,7 @@ def open_ai_chat(model, messages, streaming=False):
             max_tokens=1024,
         )
     else:
-        chat_response=''
+        chat_response = ''
         messages = client.chat.completions.create(
             model=model,
             messages=messages,

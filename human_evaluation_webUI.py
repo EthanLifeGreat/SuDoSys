@@ -1,43 +1,27 @@
-# Copyright (c) Alibaba Cloud.
-#
-# This source code is licensed under the license found in the
-# LICENSE file in the root directory of this source tree.
-
-"""A simple web interactive chat demo based on gradio."""
 import json
-
 from utils.ssid import generate_ssid
 from argparse import ArgumentParser
 import gradio as gr
-from openai import OpenAI
 import random
 import pandas as pd
-from utils.backend_main import create
+from utils.chat_with_models import chat
 
 model_name_list = ["Qwen2-7B-Instruct", "PsyChat-0724-chat", "CPsyCoun-0724-chat", "SoDuSys"]
 
-# Set OpenAI's API key and API base to use vLLM's API server.
-openai_api_key = "EMPTY"
-openai_api_base = "http://10.10.1.211:8008/v1"
-client = OpenAI(
-    api_key=openai_api_key,
-    base_url=openai_api_base,
-)
-
 # read metric.txt into metrics string
-with open("data/metrics.txt", "r", encoding="utf-8") as f:
+with open("txts/metrics.txt", "r", encoding="utf-8") as f:
     metric_str = f.read()
 
-# read metric.txt into metrics string
+# read client_portraits_cpc.json into client_portraits_cpc json data
 with open("data/client_portraits_cpc.json", 'r', encoding='utf-8') as file:
     client_portraits_cpc = json.load(file)
 
-# read metric.txt into metrics string
-with open("data/client_portrait_intro.txt", "r", encoding="utf-8") as f:
+# read client_portrait_intro.txt into cp_intro_str string
+with open("txts/client_portrait_intro.txt", "r", encoding="utf-8") as f:
     cp_intro_str = f.read()
 
 
-df_headers = ["AI咨询师", "逻辑性", "专业性", "同理心", "真实性"]
+df_headers = ["AI咨询师", "连贯性", "专业性", "同理心", "真实性"]
 default_dataframe_value = [
     ["咨询师1", 0, 0, 0, 0],
     ["咨询师2", 0, 0, 0, 0],
@@ -84,7 +68,7 @@ def _launch_demo(args):
             cache = _sds_cache[-1]
         else:
             cache = None
-        response, tmp = create(model_name, conversation, cache)
+        response, tmp = chat(model_name, conversation, cache)
         _sds_cache.append(tmp)
         _chatbot[-1] = (_query, response)
         yield _chatbot
@@ -111,7 +95,7 @@ def _launch_demo(args):
             ["咨询师3", _scores["model_3"][0], _scores["model_3"][1], _scores["model_3"][2], _scores["model_3"][3]],
             ["咨询师4", _scores["model_4"][0], _scores["model_4"][1], _scores["model_4"][2], _scores["model_4"][3]],
         ]
-        _df = pd.DataFrame(data, columns=["AI咨询师", "逻辑性", "专业性", "同理心", "真实性"])
+        _df = pd.DataFrame(data, columns=["AI咨询师", "连贯性", "专业性", "同理心", "真实性"])
         return _df
 
     js_func = """
@@ -127,7 +111,7 @@ def _launch_demo(args):
     def process_form(selection1, selection2, selection3, selection4, state, _model_id):
         if selection1 and selection2 and selection3 and selection4:
             # 生成结果
-            out = f"咨询师{_model_id}分数保存成功！\n逻辑性: {selection1}\n专业性: {selection2}" \
+            out = f"咨询师{_model_id}分数保存成功！\n连贯性: {selection1}\n专业性: {selection2}" \
                   f"\n同理心: {selection3}\n真实性: {selection4}\n\n# 所有评分保存完成后请在页面最下面表格处点击刷新后提交！"
             result = [selection1, selection2, selection3, selection4]
             # 更新状态
@@ -223,14 +207,14 @@ def _launch_demo(args):
 
                         gr.Markdown(f"## 请对AI咨询师{i}的以下4个方面进行评分：")
                         with gr.Row():
-                            logic_score = gr.Radio(["1", "2", "3", "4", "5"], label="逻辑性")
+                            logic_score = gr.Radio(["1", "2", "3", "4", "5"], label="连贯性")
                             prof_score = gr.Radio(["1", "2", "3", "4", "5"], label="专业性")
 
                         with gr.Row():
                             empathy_score = gr.Radio(["1", "2", "3", "4", "5"], label="同理心")
                             authentic_score = gr.Radio(["1", "2", "3", "4", "5"], label="真实性")
 
-                        score_submit_btn = gr.Button("保存")
+                        score_submit_btn = gr.Button("💾保存💾")
                         output = gr.Textbox(label="保存结果")
 
                         score_submit_btn.click(
@@ -238,13 +222,9 @@ def _launch_demo(args):
                             inputs=[logic_score, prof_score, empathy_score, authentic_score, scores, model_id],
                             outputs=output
                         )
-                        # score_submit_btn.click(
-                        #     update_dataframe,
-                        #     inputs=scores,
-                        #     outputs=df
-                        # )
+
         gr.Markdown("\n# ")
-        gr.Markdown("\n\n# 请更新并查看已保存分数并在最后进行整体分数提交")
+        gr.Markdown("\n\n# 请刷新并查看已保存分数后，再进行整体分数提交：")
         df = gr.Dataframe(
             value=default_dataframe_value,
             row_count=(4, "fixed"),
@@ -252,8 +232,8 @@ def _launch_demo(args):
         )
 
         with gr.Row():
-            score_status_submit_btn = gr.Button("刷新已评估分数")
-            whole_submit_btn = gr.Button("提交整个评价结果")
+            score_status_submit_btn = gr.Button("💾刷新已保存分数💾")
+            whole_submit_btn = gr.Button("🚀提交整个评价结果🚀")
         output = gr.Textbox(label="提交结果")
         # 绑定按钮点击事件
         score_status_submit_btn.click(

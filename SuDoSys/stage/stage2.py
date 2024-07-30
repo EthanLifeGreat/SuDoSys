@@ -1,6 +1,4 @@
 import re
-import json
-from utils import chat
 
 '''
 字符串正则查找位置并拼接
@@ -26,10 +24,12 @@ def insert_after_match(text, pattern, to_insert):
 
 
 def handler(message, cache):
-    fName = 'stage1.txt'
-    ff = open('./prompt/' + fName, 'r', encoding='utf-8')
+    fName = 'stage2.txt'
+    ff = open('./SuDoSys/prompt/' + fName, 'r', encoding='utf-8')
     prompt = ff.read()
-    prompt = f"{prompt}\n在前一阶段，你已经得到关于用户困扰的如下信息：{cache}"
+
+    prompt = insert_after_match(prompt, ".*?第一步传递的数据如下：", str(cache['problems']))
+
     newInput = ""
     lastMessage = ""
     conversation = message.copy()
@@ -39,17 +39,12 @@ def handler(message, cache):
 
         if conversation and conversation[-1]['role'] == 'assistant':
             lastMessage = conversation.pop()['content']
+    from SuDoSys import chat
     responseJson = chat.chatReturnJson(prompt, lastMessage, newInput)
+    print(responseJson)
 
-    # print(responseJson)
+    data1 = {"problemSelected": ""}
+    data1['problemSelected'] = responseJson['problemSelected']
+    cache.update(data1)
 
-    # historyfile = "./history.txt"
-    # with open(historyfile, 'a', encoding='utf-8') as file:
-    #     file.write("\n咨询者：" + userInput.replace("\n", "") + "\n" + "咨询师：" + responseJson['response'])
-    data = {"stage": 1}
-    try:
-        data.update(cache)
-        data['problems'] = responseJson['problems']
-    except json.decoder.JSONDecodeError:
-        data = {'problems': responseJson['problems']}
-    return responseJson, data
+    return responseJson, cache

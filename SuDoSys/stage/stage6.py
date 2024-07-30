@@ -1,6 +1,6 @@
 from openai import OpenAI
 import re
-import json
+
 openai_api_key = "EMPTY"
 openai_api_base = "http://10.10.1.211:8008/v1"
 
@@ -28,12 +28,13 @@ def insert_after_match(text, pattern, to_insert):
         # 如果没有找到匹配项，则返回原始文本或进行其他处理
         return text
 def handler(message,cache):
-    fName = 'stage3.txt'
-    ff = open('./prompt/' + fName, 'r', encoding='utf-8')
+    fName = 'stage6.txt'
+    ff = open('./SuDoSys/prompt/' + fName, 'r', encoding='utf-8')
     prompt = ff.read()
 
+    data1 = {"problemSelected": cache['problemSelected'], "solutions": cache['solutionsOK']}
 
-    prompt = insert_after_match(prompt, ".*?第二步传递的数据如下：", str(cache['problemSelected']))
+    prompt = insert_after_match(prompt, ".*?上一步传递的数据如下：", str(data1))
 
     newInput = ""
     lastMessage = ""
@@ -44,13 +45,8 @@ def handler(message,cache):
 
         if conversation and conversation[-1]['role'] == 'assistant':
             lastMessage = conversation.pop()['content']
-    from utils import chat
+    from SuDoSys import chat
     responseJson = chat.chatReturnJson(prompt, lastMessage, newInput)
     print(responseJson)
-
-    data1 = {"factors": []}
-    data1['factors'] = responseJson['factors']
-    cache.update(data1)
-
 
     return responseJson,cache

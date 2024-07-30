@@ -11,7 +11,7 @@ client = OpenAI(
 )
 
 
-def chat_psy_chat_query(message):
+def chat_with_PsyChat(message):
     prompt = "现在你扮演一位专业的心理咨询师，你具备丰富的心理学和心理健康知识。" \
              "你擅长运用多种心理咨询技巧，例如认知行为疗法原则、动机访谈技巧和解决问题导向的短期疗法。" \
              "以温暖亲切的语气，展现出共情和对来访者感受的深刻理解。" \

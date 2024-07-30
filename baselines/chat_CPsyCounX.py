@@ -3,7 +3,7 @@ import json
 import re
 
 
-def chat_cpsycount_query(message):
+def chat_with_CPsyCounX(message):
     assert len(message) % 2 != 0, "message length should be an odd number"
     query, history_dict = message[-1]["content"], message[:-1]
     history = []
