@@ -2,7 +2,7 @@ from openai import OpenAI
 import json
 
 openai_api_key = "EMPTY"
-openai_api_base = "http://10.10.1.211:8008/v1"
+openai_api_base = "http://10.10.1.213:8007/v1"
 
 client = OpenAI(
     api_key=openai_api_key,
@@ -32,7 +32,7 @@ def open_ai_chat(model, messages, streaming=False):
     return chat_response
 
 
-def chat_with_Qwen(conversation):
+def chat_with_Qwen_counselor(conversation):
     sys_prompt = [
         {"role": "system", "content": "现在你扮演一位专业的心理咨询师，以温暖亲切的语气，展现出共情和对来访者感受的深刻理解。"
                                       "以自然的方式与用户进行对话，确保回应流畅且类似人类的对话。"

@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 import gradio as gr
 import random
 import pandas as pd
-from utils.chat_with_models import chat
+from chat_with_models import chat
 
 model_name_list = ["Qwen2-7B-Instruct", "PsyChat-0724-chat", "CPsyCoun-0724-chat", "SoDuSys"]
 
@@ -135,7 +135,6 @@ def _launch_demo(args):
         # print(random_list)
         return random_list
 
-    # 示例提交按钮的处理函数（可以根据需要添加具体实现）
     def on_whole_submit(_scores, _df):
         pd_df = pd.DataFrame(_df)
         # 检查是否存在 0 值
@@ -181,7 +180,6 @@ def _launch_demo(args):
 
         cp_renew_button.click(fn=get_random_cp, outputs=client_portraits_tb)
         sds_cache = gr.State([])
-
 
         for r in range(1, 3):
             with gr.Row():

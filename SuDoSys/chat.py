@@ -1,6 +1,6 @@
 import importlib
 import re
-from typing import Iterable, Any
+from typing import Iterable, Any, Union, Dict
 from openai import OpenAI
 import json
 
@@ -86,7 +86,7 @@ def chatReturnJson(prompt, lastMessage, userInput):
     return responseJson
 
 
-def chat_with_SuDoSys(message: Iterable[ChatCompletionMessageParam], _cache: dict) -> Any:
+def chat_with_SuDoSys(message: Iterable[ChatCompletionMessageParam], _cache: Union[Dict, None] = None) -> Any:
     print(f"Handling SuDoSys")
     if not _cache:
         _cache = {'stage': 1}
@@ -115,3 +115,13 @@ def chat_with_SuDoSys(message: Iterable[ChatCompletionMessageParam], _cache: dic
         _cache["current_stage_turns"] = 0
 
     return response_json['response'], _cache
+
+
+if __name__ == '__main__':
+    cache = None
+    messages = []
+    while True:
+        user_input = input("咨询者：")
+        messages.append({"role": "user", "content": user_input})
+        response, cache = chat_with_SuDoSys(messages, cache)
+        messages.append({"role": "assistant", "content": response})

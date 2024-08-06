@@ -1,7 +1,6 @@
 import requests
 import json
-import re
-
+openai_api_base = "http://10.10.1.213:8010/v1"
 
 def chat_with_CPsyCounX(message):
     assert len(message) % 2 != 0, "message length should be an odd number"
@@ -32,7 +31,7 @@ def get_cpsycount_response(query, history):
         "Accept-Encoding": "gzip, deflate, br",
         "Connection": "keep-alive"
     }
-    response = requests.post(f'http://10.10.1.213:8010/v1/completions',
+    response = requests.post(f'{openai_api_base}/completions',
                              data=json_data,
                              headers=headers, verify=False)
     if response.status_code == 200:
