@@ -4,7 +4,7 @@ from tqdm import tqdm
 from openai import OpenAI
 import json
 
-input_file = "../data/dh_cpc.json"
+input_file = "../data/dialogue_history_cpc.json"
 output_file = "../data/client_portraits_cpc.json"
 
 max_retry_num = 3
