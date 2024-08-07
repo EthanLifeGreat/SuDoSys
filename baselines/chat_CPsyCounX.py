@@ -1,6 +1,8 @@
 import requests
 import json
+
 openai_api_base = "http://10.10.1.211:8010/v1"
+
 
 def chat_with_CPsyCounX(message):
     assert len(message) % 2 != 0, "message length should be an odd number"
@@ -13,12 +15,12 @@ def chat_with_CPsyCounX(message):
             assert dict_item["role"] == "assistant", "Utterance at odd position should be assistant's"
         history.append(dict_item["content"])
 
-    chat_response = get_cpsycount_response(query, history)
+    chat_response = get_CPsyCounX_response(query, history)
     print(chat_response)
     return chat_response
 
 
-def get_cpsycount_response(query, history):
+def get_CPsyCounX_response(query, history):
     raw_json_data = {
         "query": query,
         "history": history,
