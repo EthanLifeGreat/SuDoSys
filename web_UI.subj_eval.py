@@ -6,7 +6,7 @@ import random
 import pandas as pd
 from chat_with_models import chat
 
-model_name_list = ["Qwen2-7B-Instruct", "PsyChat-0724-chat", "CPsyCoun-0724-chat", "SoDuSys"]
+model_name_list = ["Qwen2-7B-Counselor", "PsyChat", "CPsyCounX", "SoDuSys"]
 
 # read metric.txt into metrics string
 with open("txts/metrics.txt", "r", encoding="utf-8") as f:

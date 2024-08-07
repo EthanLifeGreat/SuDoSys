@@ -1,6 +1,6 @@
 import requests
 import json
-openai_api_base = "http://10.10.1.213:8010/v1"
+openai_api_base = "http://10.10.1.211:8010/v1"
 
 def chat_with_CPsyCounX(message):
     assert len(message) % 2 != 0, "message length should be an odd number"
